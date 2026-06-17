@@ -17,7 +17,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_46643c7754536431bf43ca44d7e5816e {
+                #map_305a02888ef8b09230967eac22324474 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -145,11 +145,11 @@ function getIcon(density) {
 // RENDER MARKER
 // ===============================
 function renderMarkers(data) {
-    markers.forEach(m => map_46643c7754536431bf43ca44d7e5816e.removeLayer(m));
+    markers.forEach(m => map_305a02888ef8b09230967eac22324474.removeLayer(m));
     markers = [];
 
     data.forEach(d => {
-        const marker = L.marker([d.lat, d.lng], { icon: getIcon(d.density) }).addTo(map_46643c7754536431bf43ca44d7e5816e);
+        const marker = L.marker([d.lat, d.lng], { icon: getIcon(d.density) }).addTo(map_305a02888ef8b09230967eac22324474);
         marker.bindPopup(`<strong>${d.name}</strong><br>Kepadatan Penduduk: ${d.density.toLocaleString("id-ID")} jiwa/km&sup2;`);
         markers.push(marker);
     });
@@ -178,11 +178,6 @@ function resetData() {
 }
 
 // ===============================
-// RENDER AWAL
-// ===============================
-renderMarkers(dataBanten);
-
-// ===============================
 // LEGENDA
 // ===============================
 const legend = L.control({ position: "bottomright" });
@@ -197,12 +192,12 @@ legend.onAdd = function () {
     `;
     return div;
 };
-legend.addTo(map_46643c7754536431bf43ca44d7e5816e);
+legend.addTo(map_305a02888ef8b09230967eac22324474);
 
 // ===============================
 // SKALA & NORTH ARROW
 // ===============================
-L.control.scale({ position: "bottomleft", metric: true, imperial: false }).addTo(map_46643c7754536431bf43ca44d7e5816e);
+L.control.scale({ position: "bottomleft", metric: true, imperial: false }).addTo(map_305a02888ef8b09230967eac22324474);
 
 const northArrow = L.control({ position: "topleft" });
 northArrow.onAdd = () => {
@@ -210,17 +205,17 @@ northArrow.onAdd = () => {
     div.innerHTML = "N &uarr;";
     return div;
 };
-northArrow.addTo(map_46643c7754536431bf43ca44d7e5816e);
+northArrow.addTo(map_305a02888ef8b09230967eac22324474);
 </script>
     
-            <div class="folium-map" id="map_46643c7754536431bf43ca44d7e5816e" ></div>
+            <div class="folium-map" id="map_305a02888ef8b09230967eac22324474" ></div>
         
 </body>
 <script>
     
     
-            var map_46643c7754536431bf43ca44d7e5816e = L.map(
-                "map_46643c7754536431bf43ca44d7e5816e",
+            var map_305a02888ef8b09230967eac22324474 = L.map(
+                "map_305a02888ef8b09230967eac22324474",
                 {
                     center: [-6.45, 106.15],
                     crs: L.CRS.EPSG3857,
@@ -237,7 +232,7 @@ northArrow.addTo(map_46643c7754536431bf43ca44d7e5816e);
 
         
     
-            var tile_layer_7da7fe6dadea2df5e9a1795ed19951e7 = L.tileLayer(
+            var tile_layer_177241a97205d239ce29dce38787e579 = L.tileLayer(
                 "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {
   "minZoom": 0,
@@ -254,7 +249,12 @@ northArrow.addTo(map_46643c7754536431bf43ca44d7e5816e);
             );
         
     
-            tile_layer_7da7fe6dadea2df5e9a1795ed19951e7.addTo(map_46643c7754536431bf43ca44d7e5816e);
+            tile_layer_177241a97205d239ce29dce38787e579.addTo(map_305a02888ef8b09230967eac22324474);
+
+            // ==============================================================
+            // RENDER AWAL MARKER (Dipindahkan ke paling bawah setelah map siap)
+            // ==============================================================
+            renderMarkers(dataBanten);
         
 </script>
 </html>
