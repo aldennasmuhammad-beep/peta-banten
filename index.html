@@ -1,260 +1,454 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGIS Kependudukan Banten</title>
     
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <!-- CSS & JS Kebutuhan Peta -->
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     
-            <meta name="viewport" content="width=device-width,
-                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-            <style>
-                #map_305a02888ef8b09230967eac22324474 {
-                    position: relative;
-                    width: 100.0%;
-                    height: 100.0%;
-                    left: 0.0%;
-                    top: 0.0%;
-                }
-                .leaflet-container { font-size: 1rem; }
-            </style>
-
-            <style>html, body {
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-            }
-            </style>
-
-            <style>#map {
-                position:absolute;
-                top:0;
-                bottom:0;
-                right:0;
-                left:0;
-                }
-            </style>
-
-            <script>
-                L_NO_TOUCH = false;
-                L_DISABLE_3D = false;
-            </script>
-
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #dbe6fd;
+            padding: 15px;
+            overflow: hidden;
+        }
         
+        /* Container Utama Dashboard */
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border: 4px solid #f0f4ff;
+        }
+
+        /* Header Atas */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: #ffffff;
+            border-bottom: 2px solid #f0f4ff;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-title {
+            color: #2b3a80;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: right;
+        }
+        .header-right h2 {
+            font-size: 20px;
+            color: #3b4cb8;
+            font-weight: 800;
+        }
+        .header-right p {
+            font-size: 12px;
+            color: #8fa0dd;
+            font-weight: 600;
+        }
+        .header-icon {
+            background: #e9efff;
+            color: #3b4cb8;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* Konten Utama */
+        .main-content {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            height: calc(100% - 70px);
+            position: relative;
+        }
+
+        /* Sidebar Kiri */
+        .sidebar {
+            width: 340px;
+            background: #ffffff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            border-right: 2px solid #f0f4ff;
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        /* Input Pencarian */
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            background: #f4f7fe;
+            border: 2px solid transparent;
+            border-radius: 14px;
+            font-size: 14px;
+            color: #333;
+            transition: all 0.3s;
+        }
+        .search-input:focus {
+            border-color: #a3b8cc;
+            background: #fff;
+            outline: none;
+        }
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8898aa;
+        }
+
+        /* Detail Wilayah Panel */
+        .detail-title {
+            font-size: 16px;
+            color: #2b3a80;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+        .detail-card {
+            background: #ffffff;
+            border: 2px dashed #e2e9ff;
+            border-radius: 16px;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .wilayah-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #e2e9ff;
+            padding-bottom: 10px;
+        }
+        .wilayah-nama {
+            font-size: 18px;
+            font-weight: 700;
+            color: #8b0000;
+        }
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .status-tinggi { background: #ffebeb; color: #d63031; }
+        .status-sedang { background: #fff4e5; color: #e67e22; }
+        .status-rendah { background: #ebfbee; color: #27ae60; }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+        .info-label {
+            color: #7f8c8d;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-value {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        /* Area Peta */
+        .map-wrapper {
+            flex: 1;
+            height: 100%;
+            position: relative;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Legenda Kustom */
+        .legend-card {
+            background: white;
+            padding: 15px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            font-size: 12px;
+            line-height: 22px;
+            color: #2c3e50;
+            min-width: 180px;
+        }
+        .legend-title {
+            font-weight: 700;
+            color: #3b4cb8;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Tombol Reset & Menu Pinggir */
+        .map-btn-custom {
+            background: white;
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-    
-    
-<style>
-.legend {
-    background: white;
-    padding: 8px 10px;
-    border-radius: 6px;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    line-height: 18px;
-}
-.legend i {
-    width: 14px;
-    height: 14px;
-    float: left;
-    margin-right: 6px;
-    opacity: 0.85;
-    border-radius: 2px;
-}
-.north-arrow {
-    background: white;
-    padding: 4px 10px;
-    border-radius: 6px;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-    font-family: Arial, sans-serif;
-    font-weight: bold;
-    font-size: 14px;
-}
-</style>
-    
-<div id="filter-panel" style="
-    position: fixed;
-    top: 10px; left: 60px;
-    z-index: 9999;
-    background: white;
-    padding: 12px 14px;
-    border-radius: 8px;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    width: 220px;
-">
-    <strong>Cari & Filter Wilayah</strong><br><br>
-    <label for="searchName">Nama Kabupaten/Kota:</label><br>
-    <input type="text" id="searchName" placeholder="contoh: Serang"
-           style="width: 100%; padding: 4px; margin-bottom: 8px; box-sizing: border-box;"
-           oninput="filterData()">
 
-    <label for="minDensity">Kepadatan minimum (jiwa/km&sup2;):</label><br>
-    <input type="number" id="minDensity" placeholder="contoh: 1000"
-           style="width: 100%; padding: 4px; margin-bottom: 8px; box-sizing: border-box;"
-           oninput="filterData()">
+    <div class="dashboard-container">
+        <!-- Bagian Atas / Header -->
+        <div class="header">
+            <div class="header-left">
+                <button class="map-btn-custom"><i class="fa-solid fa-bars"></i></button>
+            </div>
+            <div class="header-right">
+                <div>
+                    <h2>Provinsi Banten 🗺️</h2>
+                    <p>Data Kepadatan Penduduk Terbaru</p>
+                </div>
+                <div class="header-icon">
+                    <i class="fa-solid fa-earth-asia"></i>
+                </div>
+            </div>
+        </div>
 
-    <button onclick="resetData()" style="width: 100%; padding: 5px; cursor: pointer;">
-        Reset
-    </button>
-</div>
-    
-<script>
-// ===============================
-// DATA KEPADATAN PENDUDUK BANTEN
-// ===============================
-const dataBanten = [{"name": "Kabupaten Pandeglang", "density": 487, "lat": -6.3175, "lng": 106.1007}, {"name": "Kabupaten Lebak", "density": 446, "lat": -6.45, "lng": 106.2528}, {"name": "Kabupaten Tangerang", "density": 3373, "lat": -6.1783, "lng": 106.6319}, {"name": "Kabupaten Serang", "density": 1181, "lat": -6.12, "lng": 106.1503}, {"name": "Kota Tangerang", "density": 11098, "lat": -6.1783, "lng": 106.6319}, {"name": "Kota Cilegon", "density": 2860, "lat": -6.0025, "lng": 106.0114}, {"name": "Kota Serang", "density": 2839, "lat": -6.1149, "lng": 106.1503}, {"name": "Kota Tangerang Selatan", "density": 8523, "lat": -6.2884, "lng": 106.718}];
+        <!-- Bagian Konten -->
+        <div class="main-content">
+            <!-- Sidebar Kiri -->
+            <div class="sidebar">
+                <div class="search-container">
+                    <input type="text" id="searchName" class="search-input" placeholder="Cari kabupaten/kota..." oninput="filterData()">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                </div>
 
-let markers = [];
+                <div class="detail-title">
+                    <i class="fa-solid fa-location-dot" style="color: #d63031;"></i> Detail Wilayah
+                </div>
 
-// ===============================
-// WARNA & ICON (sesuai kategori kepadatan jiwa/km2)
-// ===============================
-function getColor(density) {
-    if (density >= 5000) return "red";
-    if (density >= 2000) return "orange";
-    if (density >= 1000) return "yellow";
-    return "green";
-}
+                <!-- Card Detail Dinamis -->
+                <div class="detail-card" id="detail-card-content">
+                    <p style="text-align: center; color: #95a5a6; font-size: 13px;">Silakan klik marker wilayah pada peta untuk melihat detail data kependudukan.</p>
+                </div>
+                
+                <p style="font-size: 11px; color: #b2bec3; text-align: center;">WebGIS Project - Data Kependudukan</p>
+            </div>
 
-function getIcon(density) {
-    const color = getColor(density);
-    return L.icon({
-        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
-        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-    });
-}
+            <!-- Area Peta Leaflet -->
+            <div class="map-wrapper">
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
 
-// ===============================
-// RENDER MARKER
-// ===============================
-function renderMarkers(data) {
-    markers.forEach(m => map_305a02888ef8b09230967eac22324474.removeLayer(m));
-    markers = [];
+    <script>
+        // Data Kependudukan Banten Lengkap Estimasi Luas & Ibu Kota
+        const dataBanten = [
+            {"name": "Kabupaten Pandeglang", "density": 487, "pop": "1.307.000", "area": "2.683", "capital": "Pandeglang", "lat": -6.3175, "lng": 106.1007},
+            {"name": "Kabupaten Lebak", "density": 446, "pop": "1.402.000", "area": "3.142", "capital": "Rangkasbitung", "lat": -6.4500, "lng": 106.2528},
+            {"name": "Kabupaten Tangerang", "density": 3373, "pop": "3.244.000", "area": "961", "capital": "Tigaraksa", "lat": -6.1783, "lng": 106.4300},
+            {"name": "Kabupaten Serang", "density": 1181, "pop": "1.676.000", "area": "1.419", "capital": "Ciruas", "lat": -6.1200, "lng": 106.1503},
+            {"name": "Kota Tangerang", "density": 11098, "pop": "1.895.000", "area": "170", "capital": "Tangerang", "lat": -6.1783, "lng": 106.6319},
+            {"name": "Kota Cilegon", "density": 2860, "pop": "446.000", "area": "156", "capital": "Cilegon", "lat": -6.0025, "lng": 106.0114},
+            {"name": "Kota Serang", "density": 2839, "pop": "712.000", "area": "251", "capital": "Serang", "lat": -6.1149, "lng": 106.2200},
+            {"name": "Kota Tangerang Selatan", "density": 8523, "lat": -6.2884, "lng": 106.7180, "pop": "1.378.000", "area": "162", "capital": "Ciputat"}
+        ];
 
-    data.forEach(d => {
-        const marker = L.marker([d.lat, d.lng], { icon: getIcon(d.density) }).addTo(map_305a02888ef8b09230967eac22324474);
-        marker.bindPopup(`<strong>${d.name}</strong><br>Kepadatan Penduduk: ${d.density.toLocaleString("id-ID")} jiwa/km&sup2;`);
-        markers.push(marker);
-    });
-}
+        // Inisialisasi Peta - Menggunakan Basemap Minimalis CartoDB Positron agar mirip contoh
+        var map = L.map('map', {
+            center: [-6.30, 106.30],
+            zoom: 10,
+            zoomControl: false
+        });
 
-// ===============================
-// FILTER & SEARCH
-// ===============================
-function filterData() {
-    const name = document.getElementById("searchName").value.toLowerCase();
-    const minDensity = document.getElementById("minDensity").value;
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO'
+        }).addTo(map);
 
-    const filtered = dataBanten.filter(d => {
-        const matchName = name ? d.name.toLowerCase().includes(name) : true;
-        const matchDensity = minDensity ? d.density >= minDensity : true;
-        return matchName && matchDensity;
-    });
+        // Tambah tombol Zoom di kanan atas agar rapi
+        L.control.zoom({ position: 'topright' }).addTo(map);
 
-    renderMarkers(filtered);
-}
+        let markersLayer = L.layerGroup().addTo(map);
 
-function resetData() {
-    document.getElementById("searchName").value = "";
-    document.getElementById("minDensity").value = "";
-    renderMarkers(dataBanten);
-}
+        // Fungsi kategori kepadatan warna bulat
+        function getColor(density) {
+            if (density >= 5000) return "#8b0000"; // Sangat Padat
+            if (density >= 2000) return "#d63031"; // Padat
+            if (density >= 1000) return "#e67e22"; // Cukup Padat
+            return "#27ae60"; // Jarang
+        }
 
-// ===============================
-// LEGENDA
-// ===============================
-const legend = L.control({ position: "bottomright" });
-legend.onAdd = function () {
-    const div = L.DomUtil.create("div", "legend");
-    div.innerHTML = `
-        <strong>Kepadatan Penduduk (jiwa/km&sup2;)</strong><br>
-        <i style="background: green"></i> &lt; 1.000<br>
-        <i style="background: yellow"></i> 1.000 &ndash; 1.999<br>
-        <i style="background: orange"></i> 2.000 &ndash; 4.999<br>
-        <i style="background: red"></i> &ge; 5.000
-    `;
-    return div;
-};
-legend.addTo(map_305a02888ef8b09230967eac22324474);
+        function getStatusText(density) {
+            if (density >= 5000) return "Sangat Padat";
+            if (density >= 2000) return "Padat";
+            if (density >= 1000) return "Cukup Padat";
+            return "Jarang Pndk";
+        }
 
-// ===============================
-// SKALA & NORTH ARROW
-// ===============================
-L.control.scale({ position: "bottomleft", metric: true, imperial: false }).addTo(map_305a02888ef8b09230967eac22324474);
+        function getStatusClass(density) {
+            if (density >= 5000) return "status-tinggi";
+            if (density >= 2000) return "status-tinggi";
+            if (density >= 1000) return "status-sedang";
+            return "status-rendah";
+        }
 
-const northArrow = L.control({ position: "topleft" });
-northArrow.onAdd = () => {
-    const div = L.DomUtil.create("div", "north-arrow");
-    div.innerHTML = "N &uarr;";
-    return div;
-};
-northArrow.addTo(map_305a02888ef8b09230967eac22324474);
-</script>
-    
-            <div class="folium-map" id="map_305a02888ef8b09230967eac22324474" ></div>
-        
-</body>
-<script>
-    
-    
-            var map_305a02888ef8b09230967eac22324474 = L.map(
-                "map_305a02888ef8b09230967eac22324474",
-                {
-                    center: [-6.45, 106.15],
-                    crs: L.CRS.EPSG3857,
-                    ...{
-  "zoom": 9,
-  "zoomControl": true,
-  "preferCanvas": false,
-}
-
-                }
-            );
-
+        // Custom Marker Pin Warna-warni menggunakan SVG agar lebih smooth & modern
+        function createCustomIcon(density) {
+            const color = getColor(density);
+            const svgHtml = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32">
+                <path fill="${color}" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                <circle cx="12" cy="9" r="3" fill="white"/>
+            </svg>`;
             
+            return L.divIcon({
+                html: svgHtml,
+                className: 'custom-pin',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -30]
+            });
+        }
 
-        
-    
-            var tile_layer_177241a97205d239ce29dce38787e579 = L.tileLayer(
-                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                {
-  "minZoom": 0,
-  "maxZoom": 18,
-  "maxNativeZoom": 18,
-  "noWrap": false,
-  "attribution": "\u0026copy; OpenStreetMap contributors",
-  "subdomains": "abc",
-  "detectRetina": false,
-  "tms": false,
-  "opacity": 1,
-}
+        // Fungsi memunculkan data ke sidebar kiri ketika diclick
+        function showDetail(wilayah) {
+            const card = document.getElementById('detail-card-content');
+            const statusClass = getStatusClass(wilayah.density);
+            const statusText = getStatusText(wilayah.density);
 
-            );
-        
-    
-            tile_layer_177241a97205d239ce29dce38787e579.addTo(map_305a02888ef8b09230967eac22324474);
+            card.innerHTML = `
+                <div class="wilayah-header">
+                    <div class="wilayah-nama">${wilayah.name}</div>
+                    <div class="status-badge ${statusClass}"><i class="fa-solid fa-fire"></i> ${statusText}</div>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fa-solid fa-building-flag"></i> Ibu Kota</span>
+                    <span class="info-value">${wilayah.capital}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fa-solid fa-users"></i> Total Penduduk</span>
+                    <span class="info-value">${wilayah.pop} Jiwa</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fa-solid fa-map-layer-group"></i> Luas Wilayah</span>
+                    <span class="info-value">${wilayah.area} km²</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fa-solid fa-chart-area"></i> Kepadatan</span>
+                    <span class="info-value">${wilayah.density.toLocaleString('id-ID')} /km²</span>
+                </div>
+            `;
+        }
 
-            // ==============================================================
-            // RENDER AWAL MARKER (Dipindahkan ke paling bawah setelah map siap)
-            // ==============================================================
-            renderMarkers(dataBanten);
-        
-</script>
+        // Render Semua Marker ke Peta
+        function renderMarkers(data) {
+            markersLayer.clearLayers();
+            data.forEach(d => {
+                const marker = L.marker([d.lat, d.lng], { icon: createCustomIcon(d.density) });
+                
+                // Event saat marker di-klik
+                marker.on('click', function() {
+                    showDetail(d);
+                    map.setView([d.lat, d.lng], 11);
+                });
+
+                // Popup kecil standar di atas marker
+                marker.bindPopup(`<b>${d.name}</b><br>Ibu kota: ${d.capital}`);
+                markersLayer.addLayer(marker);
+            });
+        }
+
+        // Fungsi Filter / Search nama kota
+        function filterData() {
+            const searchVal = document.getElementById("searchName").value.toLowerCase();
+            const filtered = dataBanten.filter(d => d.name.toLowerCase().includes(searchVal));
+            renderMarkers(filtered);
+            
+            if(filtered.length === 1) {
+                showDetail(filtered[0]);
+                map.setView([filtered[0].lat, filtered[0].lng], 11);
+            }
+        }
+
+        // Membuat Legenda Modern Kustom di Kanan Bawah
+        const legend = L.control({ position: "bottomright" });
+        legend.onAdd = function () {
+            const div = L.DomUtil.create("div", "legend-card");
+            div.innerHTML = `
+                <div class="legend-title"><i class="fa-solid fa-palette"></i> Kepadatan Penduduk</div>
+                <div style="color: #7f8c8d; font-size:10px; margin-bottom:8px;">Jiwa per km²</div>
+                <div class="legend-item"><span class="legend-color" style="background: #8b0000"></span> &ge; 5.000 (Sangat Padat)</div>
+                <div class="legend-item"><span class="legend-color" style="background: #d63031"></span> 2.000 &ndash; 4.999</div>
+                <div class="legend-item"><span class="legend-color" style="background: #e67e22"></span> 1.000 &ndash; 1.999</div>
+                <div class="legend-item"><span class="legend-color" style="background: #27ae60"></span> &lt; 1.000 (Jarang)</div>
+            `;
+            return div;
+        };
+        legend.addTo(map);
+
+        // Render Awal saat Halaman Dimuat
+        renderMarkers(dataBanten);
+    </script>
+</body>
 </html>
